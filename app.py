@@ -1,46 +1,39 @@
-import os
-os.system("pip install yfinance")
-import yfinance as yf
 import streamlit as st
 import requests
-import pandas as pd
+import json
 
-# 🎙️ FINN's personality stays intact!
+# 🔹 Replace with your Finnhub API Key
+FINNHUB_API_KEY = "cvctdp1r01qodeubgv3gcvctdp1r01qodeubgv40"
+FINNHUB_BASE_URL = "https://finnhub.io/api/v1"
+
+# 🔹 Streamlit UI Setup
 st.title("💰 FINN - AI Financial Assistant")
-st.write("Hello! I’m **FINN**, your AI financial Advisor. Ask me about stocks, investments, and market insights.")
+st.write("Hello! I’m FINN, your AI financial Advisor. Ask me about stocks, investments, and market insights.")
 
-# ✅ Function to Fetch Live Stock Price
-def get_stock_price(ticker):
+# 🔹 User input for stock ticker
+ticker = st.text_input("Enter stock ticker (e.g., TSLA)", "")
+
+# 🔹 Function to fetch stock price
+def get_stock_price(symbol):
     try:
-        stock = yf.Ticker(ticker)
-        stock_data = stock.history(period="1d")
+        url = f"{FINNHUB_BASE_URL}/quote?symbol={symbol}&token={FINNHUB_API_KEY}"
+        response = requests.get(url)
+        data = response.json()
         
-        if stock_data.empty:
-            return "❌ Yahoo Finance is not returning data. This may be a Yahoo issue."
-        
-        price = stock_data["Close"].iloc[-1]
-        return f"📈 The current price of {ticker.upper()} is **${price:.2f}**."
-    
+        if "c" in data and data["c"] is not None:
+            return data["c"]
+        else:
+            return None
     except Exception as e:
-        return f"❌ Error fetching stock data: {e}"
+        return None
 
-# 🏦 User Input for Stock Symbol
-ticker = st.text_input("Enter stock ticker (e.g., TSLA):")
-
-if st.button("Get Stock Price"):
-    if ticker:
-        response = get_stock_price(ticker)
-        st.write(response)
+# 🔹 Fetch and display stock price
+if ticker:
+    st.write(f"Fetching real-time price for **{ticker.upper()}**...")
+    
+    price = get_stock_price(ticker.upper())
+    
+    if price is not None:
+        st.success(f"✅ **Current price of {ticker.upper()}: ${price:.2f}**")
     else:
-        st.warning("⚠️ Please enter a stock ticker.")
-
-# 📝 Debugging Logs (Shown in Hugging Face Logs)
-try:
-    debug_test = yf.Ticker("TSLA").history(period="1d")
-    if debug_test.empty:
-        print("❌ Yahoo Finance is not returning data. Check if the API is working.")
-    else:
-        print(f"✅ Debug Test: Live Tesla price fetched successfully.")
-except Exception as err:
-    print(f"❌ Debugging Error: {err}")
-
+        st.error("❌ Unable to fetch stock price. Please check the stock symbol or try again later.")
