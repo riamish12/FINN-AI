@@ -3,5 +3,9 @@ yfinance
 requests
 pandas
 numpy
+scipy
 matplotlib
+forex-python
+pycoingecko
+newsapi-python
 ollama
