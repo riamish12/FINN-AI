@@ -1,0 +1,8 @@
+
+✅ Portfolio Mode
+✅ Signal Scoring Engine
+✅ Backtest Visualization
+✅ Future Price Prediction Mode
+✅ Conviction Score & Risk Category Tagging
+✅ Invite-only Access Control
+✅ Professional FINN UI Branding
